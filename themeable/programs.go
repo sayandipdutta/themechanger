@@ -12,9 +12,9 @@ import (
 
 // light and dark theme names, and config file path
 type ThemeConfig struct {
-	Light      string `json: "light"`      // prefered theme name for light mode
-	Dark       string `json: "dark"`       // prefered theme name for dark mode
-	ConfigPath string `json: "configpath"` // config file path
+	Light      string `json:"light"`      // prefered theme name for light mode
+	Dark       string `json:"dark"`       // prefered theme name for dark mode
+	ConfigPath string `json:"configpath"` // config file path
 }
 
 // GetTheme returns the theme name based on the theme flag
