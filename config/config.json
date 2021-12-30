@@ -9,12 +9,12 @@
         "dark":       "IDLE Dark",
         "configpath": "C:\\Users\\sayan\\.idlerc\\config-main.cfg"
 	},
-	"Spyder": {
+    "Spyder": {
         "light":      "spyder",
         "dark":       "spyder/dark",
         "configpath": "C:\\Users\\sayan\\.spyder-py3\\config\\spyder.ini"
 	},
-	"WindowsTerminal":{
+    "WindowsTerminal":{
         "light":      "One Half Light",
         "dark":       "Nord",
         "configpath": "C:\\Users\\sayan\\AppData\\Local\\Packages\\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\\LocalState\\settings.json"

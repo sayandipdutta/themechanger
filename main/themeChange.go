@@ -14,16 +14,15 @@ Usage:
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"log"
 	"reflect"
 
 	"fmt"
 
-	"io/ioutil"
 	"os"
 
+	"github.com/sayandipdutta/themechanger/config"
 	"github.com/sayandipdutta/themechanger/themeable"
 )
 
@@ -47,47 +46,33 @@ func init() {
 	flag.Parse()
 }
 
-func LoadConfig() (map[string]themeable.ThemeConfig, error) {
-	// read config file (JSON) and set theme
-	jsonFile, err := os.Open("config\\config.json")
-	if err != nil {
-		return nil, err
-	}
-	defer jsonFile.Close()
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-
-	result := map[string]themeable.ThemeConfig{}
-	if err = json.Unmarshal([]byte(byteValue), &result); err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 func main() {
-	var config map[string]themeable.ThemeConfig
-	config, err := LoadConfig()
+	var conf map[string]themeable.ThemeConfig
+	conf, err := config.LoadConfig()
 	if err != nil {
 		log.Println("ERROR: Whie loading config ->", err)
 		return
 	}
 
 	var oneCom themeable.Themeable = themeable.OneCommander{
-		ThemeConfig: config["OneCommander"],
+		ThemeConfig: conf["OneCommander"],
 	}
 	var pyIDLE themeable.Themeable = themeable.PythonIDLE{
-		ThemeConfig: config["PythonIDLE"],
+		ThemeConfig: conf["PythonIDLE"],
 	}
 	var spyder themeable.Themeable = themeable.Spyder{
-		ThemeConfig: config["Spyder"],
+		ThemeConfig: conf["Spyder"],
 	}
 	var winterm themeable.Themeable = themeable.WindowsTerminal{
-		ThemeConfig: config["WindowsTerminal"],
+		ThemeConfig: conf["WindowsTerminal"],
 	}
 
-	var programs = []themeable.Themeable{oneCom, pyIDLE, spyder, winterm}
+	var programs = map[string]themeable.Themeable{
+		"OneCommander":    oneCom,
+		"PythonIDLE":      pyIDLE,
+		"Spyder":          spyder,
+		"WindowsTerminal": winterm,
+	}
 	for _, program := range programs {
 		if err := themeable.SetTheme(program, themeFlag); err != nil {
 			log.Println("ERROR:", reflect.TypeOf(program), "->", err)
