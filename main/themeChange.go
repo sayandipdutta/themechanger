@@ -8,7 +8,7 @@ Usage:
 	.\themeChange.exe --theme light			// Windows
 	./themeChange --theme dark				// Linux
 
-	go run themeChange.go -theme=light -program=oneCommander {CURRENTLY NOT SUPPORTED}
+	go run themeChange.go -theme=light -program="oneCommander spyder" {CURRENTLY NOT SUPPORTED}
 */
 
 package main
@@ -26,6 +26,7 @@ import (
 	"github.com/sayandipdutta/themechanger/themeable"
 )
 
+var Logger *log.Logger
 var themeFlag string
 
 func helpMessage() {
@@ -44,6 +45,12 @@ func init() {
 	flag.Usage = helpMessage
 	flag.StringVar(&themeFlag, "theme", "dark", "Type of theme to be set")
 	flag.Parse()
+
+	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	Logger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func main() {
@@ -54,28 +61,24 @@ func main() {
 		return
 	}
 
-	var oneCom themeable.Themeable = themeable.OneCommander{
-		ThemeConfig: conf["OneCommander"],
-	}
-	var pyIDLE themeable.Themeable = themeable.PythonIDLE{
-		ThemeConfig: conf["PythonIDLE"],
-	}
-	var spyder themeable.Themeable = themeable.Spyder{
-		ThemeConfig: conf["Spyder"],
-	}
-	var winterm themeable.Themeable = themeable.WindowsTerminal{
-		ThemeConfig: conf["WindowsTerminal"],
+	var programs = map[string]themeable.Themeable{
+		"OneCommander": themeable.OneCommander{
+			ThemeConfig: conf["OneCommander"],
+		},
+		"PythonIDLE": themeable.PythonIDLE{
+			ThemeConfig: conf["PythonIDLE"],
+		},
+		"Spyder": themeable.Spyder{
+			ThemeConfig: conf["Spyder"],
+		},
+		"WindowsTerminal": themeable.WindowsTerminal{
+			ThemeConfig: conf["WindowsTerminal"],
+		},
 	}
 
-	var programs = map[string]themeable.Themeable{
-		"OneCommander":    oneCom,
-		"PythonIDLE":      pyIDLE,
-		"Spyder":          spyder,
-		"WindowsTerminal": winterm,
-	}
 	for _, program := range programs {
 		if err := themeable.SetTheme(program, themeFlag); err != nil {
-			log.Println("ERROR:", reflect.TypeOf(program), "->", err)
+			Logger.Println(reflect.TypeOf(program), "->", err)
 		}
 		// fmt.Println(program)
 	}
