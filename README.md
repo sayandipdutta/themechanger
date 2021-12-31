@@ -6,8 +6,8 @@
 3. Golang >= 1.12.5 (If you plan to build from source)
 
 ## Supported Programs
-- [WindowsTerminal](https://www.windowsterminal.com/)
-- [OneCommander](https://www.onecmd.com/)*
+- [WindowsTerminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab)
+- [OneCommander](https://www.onecommander.com/)*
 - [PythonIDLE](https://www.python.org/downloads/)*
 - [Spyder](https://www.spyder-ide.org/)*
 
