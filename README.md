@@ -19,10 +19,12 @@ No need to install, just download the `.exe` file, and put the path to the file 
 If you plan to build from source, you will need to install Go from [here](https://golang.org/doc/install).
 After you are done installing. Get the repo and run the following command:
 ```
-cd themeChange
-go build themeChanger.go
+git clone https://github.com/sayandipdutta/themechanger.git
+cd themechange
+go mod tidy
+go build main/themeChanger.go
 ```
-`themeChange.exe` file will be created in the same directory as the repo.
+`themeChange.exe` file will be created in the `pwd`.
 
 ## Usage
 1. Open the Auto Dark Mode scripts file (see [Installation](#installation))
