@@ -5,10 +5,30 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"reflect"
 
+	"github.com/sayandipdutta/themechanger/setup"
 	"gopkg.in/ini.v1"
 )
+
+func LoadConfig() (map[string]ThemeConfig, error) {
+	// read config file (JSON) and set theme
+	confpath := setup.GetParentDir().ConfPath
+	jsonFile, err := os.Open(confpath)
+	if err != nil {
+		return nil, err
+	}
+	defer jsonFile.Close()
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+
+	result := map[string]ThemeConfig{}
+	if err = json.Unmarshal([]byte(byteValue), &result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
 
 // light and dark theme names, and config file path
 type ThemeConfig struct {
@@ -32,9 +52,7 @@ type Themeable interface {
 
 // SetTheme sets the theme for the program
 func SetTheme(program Themeable, theme string) error {
-	if theme != "light" && theme != "dark" {
-		return fmt.Errorf("%s.SetTheme: invalid theme name: %s. Use -theme=light or -theme=dark", reflect.TypeOf(program), theme)
-	}
+	fmt.Println("Setting theme to: ", program)
 	err := program.SetTheme(theme)
 	return err
 }
@@ -143,4 +161,34 @@ func (programTheme WindowsTerminal) SetTheme(theme string) error {
 		return err
 	}
 	return nil
+}
+
+type NewThemeable func(ThemeConfig) Themeable
+
+func newOneCommander(config ThemeConfig) Themeable {
+	return OneCommander{
+		config,
+	}
+}
+func newSpyder(config ThemeConfig) Themeable {
+	return Spyder{
+		config,
+	}
+}
+func newPythonIDLE(config ThemeConfig) Themeable {
+	return PythonIDLE{
+		config,
+	}
+}
+func newWindowsTerminal(config ThemeConfig) Themeable {
+	return WindowsTerminal{
+		config,
+	}
+}
+
+var Registry = map[string]NewThemeable{
+	"OneCommander":    newOneCommander,
+	"PythonIDLE":      newPythonIDLE,
+	"Spyder":          newSpyder,
+	"WindowsTerminal": newWindowsTerminal,
 }

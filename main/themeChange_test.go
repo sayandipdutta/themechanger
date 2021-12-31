@@ -1,9 +1,8 @@
 package main
 
 import (
+	"reflect"
 	"testing"
-
-	"github.com/sayandipdutta/themechanger/themeable"
 )
 
 var _ = func() bool {
@@ -11,36 +10,34 @@ var _ = func() bool {
 	return true
 }()
 
-func TestSetTheme(t *testing.T) {
-	programs := []struct {
-		prog  themeable.Themeable
+func TestValidateFlags(t *testing.T) {
+	tests := []struct {
 		theme string
+		prog  string
 	}{
-		{
-			themeable.WindowsTerminal{
-				ThemeConfig: themeable.ThemeConfig{
-					Light:      "One Half Light",
-					Dark:       "Nord",
-					ConfigPath: `C:\Users\sayan\AppData\Local\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json`,
-				},
-			},
-			"lights",
-		},
-		{
-			themeable.WindowsTerminal{
-				ThemeConfig: themeable.ThemeConfig{
-					Light:      "One Half Light",
-					Dark:       "Nord",
-					ConfigPath: `D:\Users\sayan\AppData\Local\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json`,
-				},
-			},
-			"light",
-		},
+		{"light", "OneCommander Spyder"},
+		{"dark", "OneCommander"},
+		{"light", "Spyder"},
+		{"dark", "all"},
 	}
-	for ix, program := range programs {
-		err := themeable.SetTheme(program.prog, program.theme)
-		if err == nil {
-			t.Errorf("%d. Expected error: %v, got: %v", ix, nil, err)
+	for _, tt := range tests {
+		if got := validateFlags(tt.theme, tt.prog); !reflect.DeepEqual(got, nil) {
+			t.Errorf("validateFlags() = %v, want %v", got, nil)
+		}
+	}
+	tests = []struct {
+		theme string
+		prog  string
+	}{
+		{"lights", "OneCommander"},
+		{"dark", "pyder"},
+		{"light", "all Spyder"},
+		{"dark", "hello"},
+		{"light", "Sp der"},
+	}
+	for _, tt := range tests {
+		if got := validateFlags(tt.theme, tt.prog); reflect.DeepEqual(got, nil) {
+			t.Errorf("validateFlags() = %v, expected error", nil)
 		}
 	}
 }

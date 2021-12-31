@@ -17,6 +17,7 @@ import (
 	"flag"
 	"log"
 	"reflect"
+	"strings"
 
 	"fmt"
 
@@ -28,6 +29,7 @@ import (
 
 var Logger *log.Logger
 var themeFlag string
+var commandLineProgs string
 
 func helpMessage() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n\n", os.Args[0])
@@ -44,42 +46,51 @@ func init() {
 	*/
 	flag.Usage = helpMessage
 	flag.StringVar(&themeFlag, "theme", "dark", "Type of theme to be set")
+	flag.StringVar(&commandLineProgs, "program", "all", "Program to be themed")
 	flag.Parse()
+	// Enable logging
 
-	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatal(err)
+	Logger = config.SetLogger()
+}
+
+func validateFlags(theme string, program string) error {
+	if theme != "light" && theme != "dark" {
+		return fmt.Errorf("%s.SetTheme: invalid theme name: %s. Use -theme=light or -theme=dark", reflect.TypeOf(program), theme)
 	}
-	Logger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	if program == "all" {
+		return nil
+	}
+	if err := config.ValidateProgramFlag(strings.Split(program, " ")); err != nil {
+		return err
+	}
+	return nil
 }
 
 func main() {
 	var conf map[string]themeable.ThemeConfig
-	conf, err := config.LoadConfig()
+	conf, err := themeable.LoadConfig()
 	if err != nil {
-		log.Println("ERROR: Whie loading config ->", err)
-		return
+		Logger.Fatalln("ERROR: Whie loading config ->", err)
 	}
 
-	var programs = map[string]themeable.Themeable{
-		"OneCommander": themeable.OneCommander{
-			ThemeConfig: conf["OneCommander"],
-		},
-		"PythonIDLE": themeable.PythonIDLE{
-			ThemeConfig: conf["PythonIDLE"],
-		},
-		"Spyder": themeable.Spyder{
-			ThemeConfig: conf["Spyder"],
-		},
-		"WindowsTerminal": themeable.WindowsTerminal{
-			ThemeConfig: conf["WindowsTerminal"],
-		},
+	programs := make(map[string]themeable.Themeable, len(conf))
+	for key, value := range conf {
+		programs[key] = themeable.Registry[key](value)
+	}
+	_, p, err := config.GetListedPrograms()
+	if err != nil {
+		Logger.Fatalln("ERROR: While getting listed programs ->", err)
+	}
+	if err := validateFlags(themeFlag, commandLineProgs); err != nil {
+		Logger.Fatalln("ERROR: While validating flags ->", err)
+	}
+	if commandLineProgs != "all" {
+		p = strings.Split(strings.Trim(commandLineProgs, " "), " ")
 	}
 
-	for _, program := range programs {
-		if err := themeable.SetTheme(program, themeFlag); err != nil {
-			Logger.Println(reflect.TypeOf(program), "->", err)
+	for _, program := range p {
+		if err := themeable.SetTheme(programs[program], themeFlag); err != nil {
+			Logger.Fatalln(reflect.TypeOf(program), "->", err)
 		}
-		// fmt.Println(program)
 	}
 }

@@ -1,53 +1,44 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
-	"reflect"
 
+	"github.com/sayandipdutta/themechanger/setup"
 	"github.com/sayandipdutta/themechanger/themeable"
 )
 
-func LoadConfig() (map[string]themeable.ThemeConfig, error) {
-	// read config file (JSON) and set theme
-	jsonFile, err := os.Open("config\\config.json")
+func SetLogger() *log.Logger {
+	file, err := os.OpenFile(setup.GetParentDir().LogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
+		return nil
 	}
-	defer jsonFile.Close()
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-
-	result := map[string]themeable.ThemeConfig{}
-	if err = json.Unmarshal([]byte(byteValue), &result); err != nil {
-		return nil, err
-	}
-	return result, nil
+	return log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
-func GetListedPrograms() (map[string]struct{}, error) {
-	conf, err := LoadConfig()
+func GetListedPrograms() (map[string]struct{}, []string, error) {
+	conf, err := themeable.LoadConfig()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	t := reflect.TypeOf(conf)
-	listedPrograms := make(map[string]struct{}, t.NumField())
-	for key := range listedPrograms {
+	listedPrograms := make(map[string]struct{}, len(conf))
+	var listedProgramsSlice []string
+	for key := range conf {
 		listedPrograms[key] = struct{}{}
+		listedProgramsSlice = append(listedProgramsSlice, key)
 	}
-	return listedPrograms, nil
+
+	return listedPrograms, listedProgramsSlice, nil
 }
 
-func ValidateProgramFlag(programs map[string]struct{}) error {
-	listedPrograms, err := GetListedPrograms()
+func ValidateProgramFlag(programs []string) error {
+	listedPrograms, _, err := GetListedPrograms()
 	if err != nil {
 		return err
 	}
-	for program := range programs {
+	for _, program := range programs {
 		if _, ok := listedPrograms[program]; !ok {
 			return fmt.Errorf("invalid program name: %s", program)
 		}
