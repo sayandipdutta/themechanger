@@ -30,7 +30,7 @@ go build themeChanger.go
 
 ```
   - Name: ProgramThemeSwitcher
-    Command: full\path\to\themeChange.exe   # eg. D:\Programs\themeChange\themeChange.exe
+    Command: full\path\to\themeChange.exe   # eg. D:\Programs\themechanger\themeChange.exe
     ArgsLight: [--theme, light]
     ArgsDark: [--theme, dark]
     AllowedSources: [Any]
@@ -42,7 +42,7 @@ Component:
   TimeoutMillis: 10000
   Scripts:
   - Name: ProgramThemeSwitcher
-    Command: D:\Programs\themeChange\themeChange.exe    # Example Path
+    Command: D:\Programs\themechanger\themeChange.exe    # Example Path
     ArgsLight: [--theme, light]
     ArgsDark: [--theme, dark]
     AllowedSources: [Any]
@@ -53,9 +53,23 @@ Usage of themeChange.exe:
 
 Accepted value of theme flag: 
         light
-        dark
+        dark    //default value.
+
+Accepted value of program flag:
+        all                                     //default value. Theme all programs.
+or,     "<program_name> <program_name2> ..."    Theme only specified programs.
+
+program should be provided in double quotes ("") if it contains spaces.
 
 Flags:
+  -program string
+        Program to be themed (default "all")
   -theme string
         Type of theme to be set (default "dark")
+
+Example:
+
+.\themeChange.exe                       //default value of theme == dark, program == all
+.\themeChange.exe --theme=dark          //default value of program == all
+.\themeChange.exe --theme=light --program="OneCommander Spyder"
 ```
