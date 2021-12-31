@@ -9,8 +9,9 @@ import (
 	"github.com/sayandipdutta/themechanger/themeable"
 )
 
+// SetLogger sets the logger for the program
 func SetLogger() *log.Logger {
-	file, err := os.OpenFile(setup.GetParentDir().LogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	file, err := os.OpenFile(setup.Setup().LogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 		return nil
@@ -18,6 +19,9 @@ func SetLogger() *log.Logger {
 	return log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
+// GetListedPrograms returns the list of programs and their themes
+// If the config file does not exist, it will return an error
+// If the config file is not valid, it will return an error
 func GetListedPrograms() (map[string]struct{}, []string, error) {
 	conf, err := themeable.LoadConfig()
 	if err != nil {
@@ -33,6 +37,9 @@ func GetListedPrograms() (map[string]struct{}, []string, error) {
 	return listedPrograms, listedProgramsSlice, nil
 }
 
+// ValidateProgramFlag validates the program flag
+// Given a slice of strings
+// IF any of the strings are not valid programs, it will return an error
 func ValidateProgramFlag(programs []string) error {
 	listedPrograms, _, err := GetListedPrograms()
 	if err != nil {

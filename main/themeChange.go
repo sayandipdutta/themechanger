@@ -6,9 +6,8 @@ from light to dark or dark to light, based on the theme name passed as argument.
 
 Usage:
 	.\themeChange.exe --theme light			// Windows
-	./themeChange --theme dark				// Linux
 
-	go run themeChange.go -theme=light -program="oneCommander spyder" {CURRENTLY NOT SUPPORTED}
+	go run themeChange.go -theme=light -program="oneCommander spyder"
 */
 
 package main
@@ -31,14 +30,22 @@ var Logger *log.Logger
 var themeFlag string
 var commandLineProgs string
 
+// Help message
 func helpMessage() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n\n", os.Args[0])
-	fmt.Println("Accepted value of theme flag: \n\tlight\n\tdark")
-
+	fmt.Println("Accepted value of theme flag: \n\tlight\n\tdark\t//default value.\n ")
+	fmt.Println("Accepted value of program flag: \n\tall\t\t\t\t\t//default value. Theme all programs.")
+	fmt.Println("or,\t\"<program_name> <program_name2> ...\"\tTheme only specified programs.\n ")
+	fmt.Println(`program should be provided in double quotes ("") if it contains spaces.`)
 	fmt.Println("\nFlags:")
 	flag.PrintDefaults()
+	fmt.Println("\nExample:")
+	fmt.Println("\n.\\themeChange.exe \t\t\t//default value of theme == dark, program == all")
+	fmt.Println(".\\themeChange.exe --theme=dark\t\t//default value of program == all")
+	fmt.Println(".\\themeChange.exe --theme=light --program=\"OneCommander Spyder\"")
 }
 
+// Parse flags, Initialize logger.
 func init() {
 	/*
 		Provide command line argument -theme [dark/light] to set theme
@@ -53,6 +60,9 @@ func init() {
 	Logger = config.SetLogger()
 }
 
+// Validate flags
+// Given theme and program flags, validate them.
+// If theme or program is invalid, return error.
 func validateFlags(theme string, program string) error {
 	if theme != "light" && theme != "dark" {
 		return fmt.Errorf("%s.SetTheme: invalid theme name: %s. Use -theme=light or -theme=dark", reflect.TypeOf(program), theme)

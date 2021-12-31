@@ -10,9 +10,12 @@ import (
 	"gopkg.in/ini.v1"
 )
 
+// LoadConfig loads the config file and returns the ThemeConfig
+// If the config file does not exist, it will return an error
+// If the config file is not valid, it will return an error
 func LoadConfig() (map[string]ThemeConfig, error) {
 	// read config file (JSON) and set theme
-	confpath := setup.GetParentDir().ConfPath
+	confpath := setup.Setup().ConfPath
 	jsonFile, err := os.Open(confpath)
 	if err != nil {
 		return nil, err
@@ -38,6 +41,7 @@ type ThemeConfig struct {
 }
 
 // GetTheme returns the theme name based on the theme flag
+// If the theme flag is not valid, it will return the default theme
 func (programTheme ThemeConfig) GetTheme(theme string) string {
 	if theme == "light" {
 		return programTheme.Light
@@ -51,25 +55,37 @@ type Themeable interface {
 }
 
 // SetTheme sets the theme for the program
+// Given a themeable program and a theme name, it will set the theme
+// If the theme name is not valid, it will return an error
 func SetTheme(program Themeable, theme string) error {
 	fmt.Println("Setting theme to: ", program)
 	err := program.SetTheme(theme)
 	return err
 }
 
+// Spyder is a program that can be themed
 type Spyder struct {
-	ThemeConfig
-}
-type PythonIDLE struct {
-	ThemeConfig
-}
-type OneCommander struct {
-	ThemeConfig
-}
-type WindowsTerminal struct {
-	ThemeConfig
+	ThemeConfig // theme config
 }
 
+// PythonIDLE is a program that can be themed
+type PythonIDLE struct {
+	ThemeConfig // theme config
+}
+
+// OneCommander is a program that can be themed
+type OneCommander struct {
+	ThemeConfig // theme config
+}
+
+// WindowsTerminal is a program that can be themed
+type WindowsTerminal struct {
+	ThemeConfig // theme config
+}
+
+// OneCommander.SetTheme sets the theme for OneCommander
+// Given a theme name, it will set the theme
+// If the theme name is not valid, it will return an error
 func (programTheme OneCommander) SetTheme(theme string) error {
 	// read config file (JSON) and set theme
 	jsonFile, err := os.Open(programTheme.ConfigPath)
@@ -100,7 +116,9 @@ func (programTheme OneCommander) SetTheme(theme string) error {
 	return nil
 }
 
-// read config file (CFG) and set theme
+// PythonIDLE.SetTheme sets the theme for PythonIDLE
+// Given a theme name, it will set the theme
+// If the theme name is not valid, it will return an error
 func (programTheme PythonIDLE) SetTheme(theme string) error {
 	cfg, err := ini.Load(programTheme.ConfigPath)
 	if err != nil {
@@ -116,7 +134,9 @@ func (programTheme PythonIDLE) SetTheme(theme string) error {
 	return nil
 }
 
-// read config file (INI) and set theme
+// Spyder.SetTheme sets the theme for Spyder
+// Given a theme name, it will set the theme
+// If the theme name is not valid, it will return an error
 func (programTheme Spyder) SetTheme(theme string) error {
 	cfg, err := ini.Load(programTheme.ConfigPath)
 	if err != nil {
@@ -132,7 +152,9 @@ func (programTheme Spyder) SetTheme(theme string) error {
 	return nil
 }
 
-// read config file (JSON) and set theme
+// WindowsTerminal.SetTheme sets the theme for WindowsTerminal
+// Given a theme name, it will set the theme
+// If the theme name is not valid, it will return an error
 func (programTheme WindowsTerminal) SetTheme(theme string) error {
 	jsonFile, err := os.Open(programTheme.ConfigPath)
 	if err != nil {
@@ -165,27 +187,35 @@ func (programTheme WindowsTerminal) SetTheme(theme string) error {
 
 type NewThemeable func(ThemeConfig) Themeable
 
+// newOneCommander returns a new OneCommande given a theme config
 func newOneCommander(config ThemeConfig) Themeable {
 	return OneCommander{
 		config,
 	}
 }
+
+// newSpyder returns a new Spyder given a theme config
 func newSpyder(config ThemeConfig) Themeable {
 	return Spyder{
 		config,
 	}
 }
+
+// newPythonIDLE returns a new PythonIDLE given a theme config
 func newPythonIDLE(config ThemeConfig) Themeable {
 	return PythonIDLE{
 		config,
 	}
 }
+
+// newWindowsTerminal returns a new WindowsTerminal given a theme config
 func newWindowsTerminal(config ThemeConfig) Themeable {
 	return WindowsTerminal{
 		config,
 	}
 }
 
+// Registry of themeable program creators
 var Registry = map[string]NewThemeable{
 	"OneCommander":    newOneCommander,
 	"PythonIDLE":      newPythonIDLE,
