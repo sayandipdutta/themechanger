@@ -7,7 +7,7 @@ from light to dark or dark to light, based on the theme name passed as argument.
 Usage:
 	.\themeChange.exe --theme light			// Windows
 
-	go run themeChange.go -theme=light -program="oneCommander spyder"
+	go run themeChange.go -theme=light -program="OneCommander Spyder"
 */
 
 package main
