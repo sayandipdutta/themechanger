@@ -22,7 +22,7 @@ After you are done installing. Get the repo and run the following command:
 git clone https://github.com/sayandipdutta/themechanger.git
 cd themechange
 go mod tidy
-go build main/themeChanger.go
+go build main/themeChange.go
 ```
 `themeChange.exe` file will be created in the `pwd`.
 
