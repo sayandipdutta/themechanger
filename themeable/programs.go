@@ -1,10 +1,12 @@
 package themeable
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/sayandipdutta/themechanger/setup"
 	"gopkg.in/ini.v1"
@@ -58,7 +60,7 @@ type Themeable interface {
 // Given a themeable program and a theme name, it will set the theme
 // If the theme name is not valid, it will return an error
 func SetTheme(program Themeable, theme string) error {
-	fmt.Println("Setting theme to: ", program)
+	fmt.Println("Setting theme to: ", theme, program)
 	err := program.SetTheme(theme)
 	return err
 }
@@ -138,15 +140,36 @@ func (programTheme PythonIDLE) SetTheme(theme string) error {
 // Given a theme name, it will set the theme
 // If the theme name is not valid, it will return an error
 func (programTheme Spyder) SetTheme(theme string) error {
-	cfg, err := ini.Load(programTheme.ConfigPath)
+	cfg, err := os.Open(programTheme.ConfigPath)
 	if err != nil {
 		return err
+
+	}
+	defer cfg.Close()
+	scanner := bufio.NewScanner(cfg)
+	scanner.Split(bufio.ScanLines)
+	scanner.Split(bufio.ScanLines)
+	var text []string
+	var flag bool = false
+
+	for scanner.Scan() {
+		t := scanner.Text()
+		if flag {
+			if strings.HasPrefix(t, "[") {
+				flag = false
+			}
+			if strings.HasPrefix(t, "selected =") {
+				t = "selected = " + programTheme.GetTheme(theme)
+			}
+		}
+		if !flag && strings.Contains(t, "[appearance]") {
+			flag = true
+		}
+		text = append(text, t)
 	}
 
-	var NewTheme string = programTheme.GetTheme(theme)
-	cfg.Section("appearance").Key("selected").SetValue(NewTheme)
-
-	if err = cfg.SaveTo(programTheme.ConfigPath); err != nil {
+	data := []byte(strings.Join(text, "\n"))
+	if err = ioutil.WriteFile(programTheme.ConfigPath, data, 0644); err != nil {
 		return err
 	}
 	return nil
