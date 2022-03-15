@@ -88,6 +88,7 @@ func main() {
 		programs[key] = themeable.Registry[key](value)
 	}
 	_, p, err := config.GetListedPrograms()
+
 	if err != nil {
 		Logger.Fatalln("ERROR: While getting listed programs ->", err)
 	}
@@ -100,7 +101,13 @@ func main() {
 
 	for _, program := range p {
 		if err := themeable.SetTheme(programs[program], themeFlag); err != nil {
-			Logger.Fatalln(reflect.TypeOf(program), "->", err)
+			if !strings.Contains(err.Error(), "failed to open config file: ") {
+				Logger.Fatalln(reflect.TypeOf(program), "->", err)
+
+			}
+			println("Failed to load config. Skipped.")
+			Logger.Println(reflect.TypeOf(program), "->", err)
+
 		}
 	}
 }

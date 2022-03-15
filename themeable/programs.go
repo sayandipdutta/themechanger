@@ -92,7 +92,7 @@ func (programTheme OneCommander) SetTheme(theme string) error {
 	// read config file (JSON) and set theme
 	jsonFile, err := os.Open(programTheme.ConfigPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open config file: %v", err)
 	}
 	defer jsonFile.Close()
 	byteValue, err := ioutil.ReadAll(jsonFile)
@@ -124,7 +124,7 @@ func (programTheme OneCommander) SetTheme(theme string) error {
 func (programTheme PythonIDLE) SetTheme(theme string) error {
 	cfg, err := ini.Load(programTheme.ConfigPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open config file: %v", err)
 	}
 
 	var NewTheme string = programTheme.GetTheme(theme)
@@ -142,7 +142,7 @@ func (programTheme PythonIDLE) SetTheme(theme string) error {
 func (programTheme Spyder) SetTheme(theme string) error {
 	cfg, err := os.Open(programTheme.ConfigPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open config file: %v", err)
 
 	}
 	defer cfg.Close()
@@ -181,7 +181,7 @@ func (programTheme Spyder) SetTheme(theme string) error {
 func (programTheme WindowsTerminal) SetTheme(theme string) error {
 	jsonFile, err := os.Open(programTheme.ConfigPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open config file: %v", err)
 	}
 	defer jsonFile.Close()
 	byteValue, err := ioutil.ReadAll(jsonFile)
