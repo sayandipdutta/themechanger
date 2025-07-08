@@ -10,13 +10,13 @@ import (
 // LoadConfig loads the config file and returns the ThemeConfig
 // If the config file does not exist, it will return an error
 // If the config file is not valid, it will return an error
-func LoadConfig() (map[string]ThemeConfig, error) {
+func loadConfig() (map[string]themeConfig, error) {
 	// read config file (JSON) and set theme
-	confpath := os.Getenv("THEMECHANGER_CONFIG")
-	if confpath == "" {
+	confPath := os.Getenv("THEMECHANGER_CONFIG")
+	if confPath == "" {
 		return nil, fmt.Errorf("envvar THEMECHANGER_CONFIG is not defined!")
 	}
-	jsonFile, err := os.Open(confpath)
+	jsonFile, err := os.Open(confPath)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func LoadConfig() (map[string]ThemeConfig, error) {
 		return nil, err
 	}
 
-	result := map[string]ThemeConfig{}
+	result := map[string]themeConfig{}
 	if err = json.Unmarshal([]byte(byteValue), &result); err != nil {
 		return nil, err
 	}
@@ -34,13 +34,13 @@ func LoadConfig() (map[string]ThemeConfig, error) {
 }
 
 // light and dark theme names, and config file path
-type ThemeConfig struct {
+type themeConfig struct {
 	Light      string `json:"light"`      // prefered theme name for light mode
 	Dark       string `json:"dark"`       // prefered theme name for dark mode
 	ConfigPath string `json:"configpath"` // config file path
 }
 
-func (programTheme *ThemeConfig) SetTheme(isLight bool) error {
+func (programTheme *themeConfig) setTheme(isLight bool) error {
 	// Open the source file
 	src := programTheme.Dark
 	if isLight {

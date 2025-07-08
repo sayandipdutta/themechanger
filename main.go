@@ -41,8 +41,8 @@ func main() {
 	log.SetOutput(file)
 	log.Printf("INFO: Application started successfully!")
 
-	var conf map[string]ThemeConfig
-	conf, err = LoadConfig()
+	var conf map[string]themeConfig
+	conf, err = loadConfig()
 	if err != nil {
 		log.Fatalln("ERROR: Whie loading config ->", err)
 	}
@@ -52,12 +52,12 @@ func main() {
 		theme = "light"
 	}
 
-	for program_name, theme_config := range conf {
-		err := theme_config.SetTheme(*themeFlag)
+	for programName, config := range conf {
+		err := config.setTheme(*themeFlag)
 		if err != nil {
-			log.Println(program_name, "->", err)
+			log.Println(programName, "->", err)
 		} else {
-			log.Printf("INFO: successfully changed theme of %s to %s\n", program_name, theme)
+			log.Printf("INFO: successfully changed theme of %s to %s\n", programName, theme)
 		}
 	}
 }
