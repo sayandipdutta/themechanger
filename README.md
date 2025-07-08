@@ -3,28 +3,24 @@
 ## Requirements:
 1. Windows 10 or higher
 2. Auto Dark Mode >= 10.0.0
-3. Golang >= 1.12.5 (If you plan to build from source)
-
-## Supported Programs
-- [WindowsTerminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab)
-- [OneCommander](https://www.onecommander.com/)*
-- [PythonIDLE](https://www.python.org/downloads/)*
-- [Spyder](https://www.spyder-ide.org/)*
-
-**\* Program must be closed while the theme switch takes place, for the theme switch to take effect.**
+3. Golang >= 1.23.5 (If you plan to build from source)
 
 ## Installation
-No need to install, just download the `.exe` file, and put the path to the file in Auto Dark Mode scripts file (see [Usage](#usage))
+```sh
+go install github.com/sayandipdutta/themechanger
+```
 
 If you plan to build from source, you will need to install Go from [here](https://golang.org/doc/install).
 After you are done installing. Get the repo and run the following command:
 ```
 git clone https://github.com/sayandipdutta/themechanger.git
-cd themechange
+cd themechanger
 go mod tidy
-go build main/themeChange.go
+go build
 ```
-`themeChange.exe` file will be created in the `pwd`.
+`themechanger.exe` file will be created in the `pwd`.
+
+You can then add it to your `%PATH` (`$Env:PATH` from `powershell`).
 
 ## Usage
 1. Open the Auto Dark Mode scripts file (see [Installation](#installation))
@@ -32,9 +28,9 @@ go build main/themeChange.go
 
 ```
   - Name: ProgramThemeSwitcher
-    Command: full\path\to\themeChange.exe   # eg. D:\Programs\themechanger\themeChange.exe
-    ArgsLight: [--theme, light]
-    ArgsDark: [--theme, dark]
+    Command: themechanger.exe  # if added to PATH, else the full path to the exe
+    ArgsLight: [-light]
+    ArgsDark: []
     AllowedSources: [Any]
 ```
 The `scripts.yml` file should look like this:
@@ -44,34 +40,37 @@ Component:
   TimeoutMillis: 10000
   Scripts:
   - Name: ProgramThemeSwitcher
-    Command: D:\Programs\themechanger\themeChange.exe    # Example Path
-    ArgsLight: [--theme, light]
-    ArgsDark: [--theme, dark]
+    Command: themechanger.exe  # if added to PATH, else the full path to the exe
+    ArgsLight: [-light]
+    ArgsDark: []
     AllowedSources: [Any]
 ```
 Usage of `themeChange.exe` is as follows:
 ```
 Usage of themeChange.exe:
 
-Accepted value of theme flag: 
-        light
-        dark    //default value.
-
-Accepted value of program flag:
-        all                                     //default value. Theme all programs.
-or,     "<program_name> <program_name2> ..."    Theme only specified programs.
-
-program should be provided in double quotes ("") if it contains spaces.
-
 Flags:
-  -program string
-        Program to be themed (default "all")
-  -theme string
-        Type of theme to be set (default "dark")
+  -light light
+        If given, light theme will be set, otherwise `dark`.
 
 Example:
-
-.\themeChange.exe                       //default value of theme == dark, program == all
-.\themeChange.exe --theme=dark          //default value of program == all
-.\themeChange.exe --theme=light --program="OneCommander Spyder"
+.\themeChange.exe
+.\themeChange.exe -light
 ```
+
+## Configuration:
+`themechanger` looks for the config file in `$Env:THEMECHANGER_CONFIG`.
+
+So populate a `json` file with the following structure:
+```json5
+{
+  "YourAppName": {
+    "light": "X:full\\path\\to\\light\\themeconfig\\for\\YourAppName",
+    "dark": "X:full\\path\\to\\dark\\themeconfig\\for\\YourAppName",
+    "configpath": "X:full\\path\\to\\YourApp's\\Default\\ConfigPath"
+  },
+  // ... other apps
+}
+```
+
+And set the path of the file as `$Env:THEMECHANGER_CONFIG`
