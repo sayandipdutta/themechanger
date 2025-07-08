@@ -1,4 +1,4 @@
-package themeable
+package main
 
 import "testing"
 
