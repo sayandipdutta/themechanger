@@ -33,11 +33,11 @@ func loadConfig() (map[string]themeConfig, error) {
 	return result, nil
 }
 
-// light and dark theme names, and config file path
+// light and dark theme config paths, and target config file path
 type themeConfig struct {
-	Light      string `json:"light"`      // prefered theme name for light mode
-	Dark       string `json:"dark"`       // prefered theme name for dark mode
-	ConfigPath string `json:"configpath"` // config file path
+	Light      string `json:"light"`      // light theme config path
+	Dark       string `json:"dark"`       // dark theme config path
+	ConfigPath string `json:"configpath"` // target config file path
 }
 
 func (programTheme *themeConfig) setTheme(isLight bool) error {

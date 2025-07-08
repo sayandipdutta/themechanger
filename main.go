@@ -53,10 +53,10 @@ func main() {
 	if ok {
 		logfile := filepath.Join(logfolder, "themechanger.log")
 		logwriter, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-		defer logwriter.Close()
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer logwriter.Close()
 		log.SetOutput(io.MultiWriter(os.Stderr, logwriter))
 	} else {
 		log.SetOutput(os.Stderr)
