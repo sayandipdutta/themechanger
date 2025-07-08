@@ -101,12 +101,12 @@ func main() {
 
 	for _, program := range p {
 		if err := themeable.SetTheme(programs[program], themeFlag); err != nil {
-			if !strings.Contains(err.Error(), "failed to open config file: ") {
-				Logger.Fatalln(reflect.TypeOf(program), "->", err)
-
+			if strings.Contains(err.Error(), "failed to open config file: ") {
+				println("Failed to load config. Skipped.")
+				Logger.Println(reflect.TypeOf(program), "->", err)
+				continue
 			}
-			println("Failed to load config. Skipped.")
-			Logger.Println(reflect.TypeOf(program), "->", err)
+			Logger.Fatalln(reflect.TypeOf(program), "->", err)
 
 		}
 	}
